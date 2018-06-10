@@ -27,6 +27,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 
 public class Main extends ApplicationAdapter implements GestureDetector.GestureListener{
+	public static final float PPM = 32;
+
 	SpriteBatch batch;
 	Texture img;
 
@@ -41,6 +43,8 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 	Stage stage;
 	CatActor cat;
 
+	Body body;
+
 	@Override
 	public void create () {
 
@@ -49,17 +53,17 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 
 		Gdx.input.setInputProcessor(stage);
 
-		cat = new CatActor();
+		cat = new CatActor(this);
 		stage.addActor(cat);
 		//stage.setKeyboardFocus(actor);
 
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		//img = new Texture("badlogic.jpg");
 		dropImage = new Texture("droplet.png");
 		bucketImage = new Texture("bucket.png");
 
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 1800);
+		camera.setToOrtho(false, 800/PPM, 1800/PPM);
 
 		bucket = new Rectangle();
 		bucket.x = 800 / 2 - 100 / 2;
@@ -69,14 +73,14 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 
 		Box2D.init();
 
-		world = new World(new Vector2(0, -10), true);
+		world = new World(new Vector2(0, -50), true);
 		debugRenderer = new Box2DDebugRenderer();
 
 		// Create our body definition
 		BodyDef groundBodyDef = new BodyDef();
 		groundBodyDef.type = BodyDef.BodyType.KinematicBody;
 // Set its world position
-		groundBodyDef.position.set(new Vector2(100, 200));
+		groundBodyDef.position.set(new Vector2(100/PPM, 200/PPM));
 
 // Create a body from the defintion and add it to the world
 		Body groundBody = world.createBody(groundBodyDef);
@@ -91,30 +95,54 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 // Clean up after ourselves
 		groundBox.dispose();
 
+		/*Creates the LEFT WALL static body*/
+		BodyDef leftWallDef = new BodyDef();
+		leftWallDef.type = BodyDef.BodyType.StaticBody;
+		leftWallDef.position.set(new Vector2(0, 0));
+		Body leftWall = world.createBody(leftWallDef); //CREATES THE ACTUAL BODY SO YOU CAN ADD THE BODY IN RENDER
+		PolygonShape leftWallBox = new PolygonShape();
+		leftWallBox.setAsBox(0, camera.viewportHeight);
+		leftWall.createFixture(leftWallBox, 0);
+		leftWallBox.dispose();
 
+		/*Creates the RIGHT WALL static body*/
+		BodyDef rightWallDef = new BodyDef();
+		rightWallDef.type = BodyDef.BodyType.StaticBody;
+		rightWallDef.position.set(new Vector2(800/PPM, 0));
+		Body rightWall = world.createBody(rightWallDef); //CREATES THE ACTUAL BODY SO YOU CAN ADD THE BODY IN RENDER
+		PolygonShape rightWallBox = new PolygonShape();
+		rightWallBox.setAsBox(0, camera.viewportHeight);
+		rightWall.createFixture(rightWallBox, 0);
+		rightWallBox.dispose();
+
+
+		////THIS IS THE BOUNCING BALL/////////////////
 		// First we create a body definition
 		BodyDef bodyDef = new BodyDef();
 // We set our body to dynamic, for something like ground which doesn't move we would set it to StaticBody
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 // Set our body's starting position in the world
-		bodyDef.position.set(200, 1000);
+		bodyDef.position.set(200/PPM, 1000/PPM);
 
 // Create our body in the world using our body definition
-		Body body = world.createBody(bodyDef);
+		body = world.createBody(bodyDef);
 
 // Create a circle shape and set its radius to 6
 		CircleShape circle = new CircleShape();
-		circle.setRadius(30f);
+		circle.setRadius(30f/PPM);
 
 // Create a fixture definition to apply our shape to
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = circle;
-		fixtureDef.density = 0.5f;
-		fixtureDef.friction = 0.4f;
+		fixtureDef.density = 1f;
+		fixtureDef.friction = 1f;
 		fixtureDef.restitution = 0.6f; // Make it bounce a little bit
 
 // Create our fixture and attach it to the body
 		Fixture fixture = body.createFixture(fixtureDef);
+		//body.applyForceToCenter(500,500,true);
+		//body.setLinearVelocity(500,500);
+
 
 // Remember to dispose of any shapes after you're done with them!
 // BodyDef and FixtureDef don't need disposing, but shapes do.
@@ -131,10 +159,6 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
-
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 
@@ -149,9 +173,9 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 			Vector3 touchPos = new Vector3();
 			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			//camera.unproject(touchPos);
-			bucket.x = touchPos.x - 64 / 2;
-			System.out.println("bucket is at : " + touchPos.x + ", " + touchPos.y);
-			bucket.y = 1800 - touchPos.y - 20; //screen is 1800 pixel tall
+			//bucket.x = touchPos.x - 64 / 2;
+			//System.out.println("bucket is at : " + touchPos.x + ", " + touchPos.y);
+			//bucket.y = 1800 - touchPos.y - 20; //screen is 1800 pixel tall
 			//bucket.y = touchPos.y;
 		}
 		debugRenderer.render(world, camera.combined);
@@ -177,7 +201,16 @@ public class Main extends ApplicationAdapter implements GestureDetector.GestureL
 		img.dispose();
 	}
 
+	public Body getBody(){
+		System.out.println("Inside getBody");
+		System.out.println("mass of body is: " + body.getMass());
+		return body;
+	}
 
+	/*Not used for now. Going to use body's methods to get current position rather than set a constant to initial position
+	public int getBodyInitialPosition(){
+		return 0;
+	} */
 
 	////ADVANCED EVENT HANDLERS
 
