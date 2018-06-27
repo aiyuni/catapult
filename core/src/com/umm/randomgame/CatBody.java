@@ -1,0 +1,88 @@
+package com.umm.randomgame;
+
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.World;
+
+
+/**Defines the Cat Body. */
+public class CatBody implements ContactListener {
+
+    public static final int PPM = 30;
+
+    private Body catBody;
+    private World world;
+    private BodyDef bodyDef;
+    private Fixture fixture;
+    private CircleShape circle;
+
+    /**Constructs the cat body using its bodyDef parameter. */
+    public CatBody(World world, BodyDef bodyDef) {
+
+        this.world = world;
+        this.bodyDef = bodyDef;
+
+        catBody = world.createBody(bodyDef);
+
+        circle = new CircleShape();
+        circle.setRadius(30f/PPM);
+
+        // Create a fixture definition to describe the cat.
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = circle;
+        fixtureDef.density = 1f;
+        fixtureDef.friction = 1f;
+        fixtureDef.restitution = 0.5f; // this affects the cat's bounce
+
+        fixture = catBody.createFixture(fixtureDef);
+
+        circle.dispose();
+    }
+    @Override
+    public void beginContact(Contact contact) {
+        //System.out.println("Began contact between: " + contact.getFixtureA().getBody().toString() + ", and " + contact.getFixtureB().getBody().toString());
+    }
+
+    @Override
+    public void endContact(Contact contact) {
+
+    }
+
+    @Override
+    public void preSolve(Contact contact, Manifold oldManifold) {
+        //this stuff is done continiously after each step while the object is colliding
+    }
+
+    @Override
+    public void postSolve(Contact contact, ContactImpulse impulse) {
+        //this stuff is done continiously after preSolve while the object is collidng
+    }
+
+    public float getX(){
+
+        return catBody.getPosition().x;
+
+    }
+
+    public float getY(){
+        return catBody.getPosition().y;
+    }
+
+    public Fixture getFixture() {
+        return fixture;
+    }
+
+    public Body getBody() {
+        return catBody;
+    }
+
+
+}
+
