@@ -83,8 +83,14 @@ public class BasketActor extends Actor {
                 System.out.println("xAngle is: "  + xAngle);
 
                 /**This rotates the bottom portion of the basket based on its center (origin) */
+                if (xAngle > 0 ) {
+                    game.getInitialBasket().setTransform(game.getInitialBasket().getPosition(), xAngle + 3* (float) Math.PI/2);
+                }
+                else if (xAngle < 0) {
+                    game.getInitialBasket().setTransform(game.getInitialBasket().getPosition(), xAngle +  (float) Math.PI / 2);
+                }
                 //mainClassReference.getInitialBasketBottom().setTransform(mainClassReference.getInitialBasketBottom().getPosition(), xAngle + (float) Math.PI/2);
-                System.out.println("angle of initial basket bottom is: " + game.getInitialBasketBottom().getAngle());
+                System.out.println("angle of initial basket bottom is: " + game.getInitialBasket().getAngle());
                 // mainClassReference.getInitialBasketRight()
 
                 //mainClassReference.getInitialBasketLeft().setTransform(mainClassReference.getInitialBasketLeft().getPosition(), xAngle + (float) (Math.PI/2));

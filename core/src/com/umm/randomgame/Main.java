@@ -70,12 +70,15 @@ public class Main extends ApplicationAdapter {
 	private CatBody catBody;
 
 	private Body initialBasketBottom;
-	private Body initialBasketLeft;
-	private Body initialBasketRight;
+	//private Body initialBasketLeft;
+	//private Body initialBasketRight;
 
 	private Body targetBasketBottom;
-	private Body targetBasketLeft;
-	private Body targetBasketRight;
+	//private Body targetBasketLeft;
+	//private Body targetBasketRight;
+
+	private Body initialBasket;
+	private Body targetBasket;
 
 	private Sprite cat;
 
@@ -188,20 +191,28 @@ public class Main extends ApplicationAdapter {
 					bodiesToDestroy[1] = initialBasketBottom;
 					bodiesToDestroy[2] = initialBasketRight; */
 
+					/*
 					bodiesToDestroy = new Body[6];
 					bodiesToDestroy[0] = initialBasketBottom;
 					bodiesToDestroy[1] = initialBasketLeft;
 					bodiesToDestroy[2] = initialBasketRight;
 					bodiesToDestroy[3] = targetBasketBottom;
 					bodiesToDestroy[4] = targetBasketRight;
-					bodiesToDestroy[5] = targetBasketLeft;
+					bodiesToDestroy[5] = targetBasketLeft; */
+
+					bodiesToDestroy = new Body[4];
+					bodiesToDestroy[0] = initialBasketBottom;
+					bodiesToDestroy[1] = initialBasket;
+					bodiesToDestroy[2] = targetBasketBottom;
+					bodiesToDestroy[3] = targetBasket;
 
 					System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
 							+ " , " + initialBasketBottom.getPosition().y);
 
 					initialBasketBottom = targetBasketBottom;
-					initialBasketLeft = targetBasketLeft;
-					initialBasketRight = targetBasketRight;
+					initialBasket = targetBasket;
+					//initialBasketLeft = targetBasketLeft;
+					//initialBasketRight = targetBasketRight;
 
 					System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
 							+ " , " + initialBasketBottom.getPosition().y);
@@ -271,11 +282,11 @@ public class Main extends ApplicationAdapter {
 
 		/**If the cat is in the target basket, spawn new basket. Still needs work... */
 		if (scored == true){
-			for (int i =0; i<bodiesToDestroy.length - 3; i++){
+			for (int i =0; i<bodiesToDestroy.length - 2; i++){
 				world.destroyBody(bodiesToDestroy[i]);
 			}
 			drawInitialBasket((int)(targetBasketBottom.getPosition().x * PPM), initialY);
-			for (int i = 3; i < bodiesToDestroy.length; i++){
+			for (int i = 2; i < bodiesToDestroy.length; i++){
 				world.destroyBody(bodiesToDestroy[i]);
 			}
 			int[] randomPosition = randomizePosition(initialX, targetY);
@@ -292,7 +303,27 @@ public class Main extends ApplicationAdapter {
 	/**Draws the initial (lower) basket*/
 	public void drawInitialBasket(int x, int y){
 
-		//Horizontal Line for basket//
+		//Draws the entire basket body
+		BodyDef basketDef = new BodyDef();
+		basketDef.type = BodyDef.BodyType.KinematicBody;
+		basketDef.position.set(new Vector2(x/PPM, y/PPM));
+		initialBasket = world.createBody(basketDef);
+		initialBasket.setUserData(basketDef);
+		EdgeShape basketBase = new EdgeShape(); //PolygonShape sets how long the line is
+		basketBase.set(new Vector2(-1,0), new Vector2(1, 0));
+		EdgeShape basketLeftArm = new EdgeShape();
+		basketLeftArm.set(new Vector2(-1, 0), new Vector2(-3,3));
+		EdgeShape basketRightArm = new EdgeShape();
+		basketRightArm.set(new Vector2(1, 0), new Vector2(3, 3));
+		initialBasket.createFixture(basketBase,0);
+		initialBasket.createFixture(basketRightArm,0);
+		initialBasket.createFixture(basketLeftArm, 0);
+		basketBase.dispose();
+		basketLeftArm.dispose();
+		basketRightArm.dispose();
+
+
+		//Horizontal Line for basket for collision purposes//
 		BodyDef basketBottomDef = new BodyDef();
 		basketBottomDef.type = BodyDef.BodyType.KinematicBody;  //BodyDef sets the position of the line
 		basketBottomDef.position.set(new Vector2(x/PPM, y/PPM));
@@ -304,6 +335,8 @@ public class Main extends ApplicationAdapter {
 		initialBasketBottom.createFixture(initialBasketBottomBox, 0);
 		initialBasketBottomBox.dispose();
 
+		/*
+
 		//Right Diagonal Line for basket
 		BodyDef basketRightDef = new BodyDef();
 		basketRightDef.type = BodyDef.BodyType.KinematicBody;
@@ -313,6 +346,7 @@ public class Main extends ApplicationAdapter {
 		EdgeShape basketRightBox = new EdgeShape();
 		basketRightBox.set(new Vector2(-0,0), new Vector2(2,3));
 		initialBasketRight.createFixture(basketRightBox, 0);
+
 		basketRightBox.dispose();
 
 		//Left Diagonal Line for basket //
@@ -326,14 +360,34 @@ public class Main extends ApplicationAdapter {
 		initialBasketLeft.createFixture(basketLeftBox, 0);
 		basketLeftBox.dispose();
 
-
+        */
 	}
 
 	/** Draws the target (upper) basket */
 	public void drawBasketShape(int x, int y) {
 
 		System.out.println("Drawing target basket at: " + x + ", " + y + ", after PPM adjustion is: " + x/PPM + ", " + y/PPM);
-		//Draw the bottom line
+
+		/**This is the entire basket body */
+		BodyDef basketDef = new BodyDef();
+		basketDef.type = BodyDef.BodyType.KinematicBody;
+		basketDef.position.set(new Vector2(x/PPM, y/PPM));
+		targetBasket = world.createBody(basketDef);
+		targetBasket.setUserData(basketDef);
+		EdgeShape basketBase = new EdgeShape(); //PolygonShape sets how long the line is
+		basketBase.set(new Vector2(-1,0), new Vector2(1, 0));
+		EdgeShape basketLeftArm = new EdgeShape();
+		basketLeftArm.set(new Vector2(-1, 0), new Vector2(-3,3));
+		EdgeShape basketRightArm = new EdgeShape();
+		basketRightArm.set(new Vector2(1, 0), new Vector2(3, 3));
+		targetBasket.createFixture(basketBase,0);
+		targetBasket.createFixture(basketRightArm,0);
+		targetBasket.createFixture(basketLeftArm, 0);
+		basketBase.dispose();
+		basketLeftArm.dispose();
+		basketRightArm.dispose();
+
+		//Draw the bottom line for collision detection purposes
 		BodyDef targetBasketBottomDef = new BodyDef();
 		targetBasketBottomDef.type = BodyDef.BodyType.KinematicBody;  //BodyDef sets the position of the line
 		targetBasketBottomDef.position.set(new Vector2(x/PPM, y/PPM));
@@ -344,6 +398,7 @@ public class Main extends ApplicationAdapter {
 		targetBasketBottom.createFixture(targetBasketBottomBox, 0);
 		targetBasketBottomBox.dispose();
 
+		/*
 		//Right Diagonal Line for basket//
 		BodyDef targetBasketRightDef = new BodyDef();
 		targetBasketRightDef.type = BodyDef.BodyType.KinematicBody;
@@ -365,6 +420,8 @@ public class Main extends ApplicationAdapter {
 		targetBasketLeftBox.set(new Vector2(-0,0), new Vector2(-2,3));
 		targetBasketLeft.createFixture(targetBasketLeftBox, 0);
 		targetBasketLeftBox.dispose();
+
+		*/
 
 		initialX = x; //so that randomizePosition() work correctly
 
@@ -404,6 +461,7 @@ public class Main extends ApplicationAdapter {
 		return initialBasketBottom;
 	}
 
+	/*
 	public Body getInitialBasketLeft() {
 		return initialBasketLeft;
 	}
@@ -412,7 +470,11 @@ public class Main extends ApplicationAdapter {
 
 		return initialBasketRight;
 	}
+	*/
 
+	public Body getInitialBasket(){
+		return initialBasket;
+	}
 	@Override
 	public void dispose () {
 		batch.dispose();
