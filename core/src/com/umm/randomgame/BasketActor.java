@@ -67,6 +67,8 @@ public class BasketActor extends Actor {
             /**Takes in 3 parameters: x is the touch x coordinate, y is the touch y coordinate, pointer is useless */
             public boolean touchDragged (int x, int y, int pointer) {
 
+                game.getCatBody().getFixture().setRestitution(0.5f);
+
                 //newX and newY are adjusted coordinates calculated to use for draw().
                 newX = x - sprite.getWidth()/2;
                 newY = 1800 - y - sprite.getHeight()/2;  //1800 - y because libGDX coordinate system and box2D coordinate system in the y-direction are reversed
@@ -89,12 +91,12 @@ public class BasketActor extends Actor {
                 else if (xAngle < 0) {
                     game.getInitialBasket().setTransform(game.getInitialBasket().getPosition(), xAngle +  (float) Math.PI / 2);
                 }
-                //mainClassReference.getInitialBasketBottom().setTransform(mainClassReference.getInitialBasketBottom().getPosition(), xAngle + (float) Math.PI/2);
-                System.out.println("angle of initial basket bottom is: " + game.getInitialBasket().getAngle());
-                // mainClassReference.getInitialBasketRight()
 
-                //mainClassReference.getInitialBasketLeft().setTransform(mainClassReference.getInitialBasketLeft().getPosition(), xAngle + (float) (Math.PI/2));
-                //mainClassReference.getInitialBasketRight().setTransform(mainClassReference.getInitialBasketRight().getPosition(), xAngle + (float)(Math.PI/2));
+                //this is for collision detection purposes for now
+                game.getInitialBasketBottom().setTransform(game.getInitialBasketBottom().getPosition(), xAngle + (float) Math.PI/2);
+
+                System.out.println("angle of initial basket bottom is: " + game.getInitialBasket().getAngle());
+
                 game.render();
 
                 return false;
@@ -103,6 +105,7 @@ public class BasketActor extends Actor {
             /**This method simply keeps track of the where the user touched, and whether or not the touch is out of range */
             @Override
             public boolean touchDown (int x, int y, int pointer, int button){
+
                 System.out.println("Coordinate of pressing down is: " + x + ", " + y);
                 if (Math.abs(x - initialX) < 100 && Math.abs( 1800 - y - initialY) < 100) {
                     System.out.println("Coordinate of pressing down is: " + x + ", " + y);
@@ -135,7 +138,7 @@ public class BasketActor extends Actor {
 
                 /**If the user drag is within range, apply force based on the drag distance */
                 if (Math.abs(xDifference) < 300 && Math.abs(yDifference) < 400 && !outOfRange) {
-                    Body body = game.getBody();
+                    Body body = game.getCatBody().getBody();
                     float mass = body.getMass(); //mass = density * area,  impulse / mass = velocity
 
                     //change these values to affect the force of the ball
@@ -143,8 +146,8 @@ public class BasketActor extends Actor {
                     float impulseY = -yDifference * 2.1f;
 
                     //applies the force to the cat
-                    game.getBody().applyLinearImpulse(impulseX, impulseY, game.getBody().getPosition().x,
-                            game.getBody().getPosition().y, true);
+                    game.getCatBody().getBody().applyLinearImpulse(impulseX, impulseY, game.getCatBody().getBody().getPosition().x,
+                            game.getCatBody().getBody().getPosition().y, true);
 
                     game.render(); //this must be called to update the dynamic shape!
                     System.out.println("impulse is: " + impulseX + ", " + impulseY);

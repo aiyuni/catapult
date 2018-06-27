@@ -50,10 +50,10 @@ public class Main extends ApplicationAdapter {
 	public boolean scored = false;
 
 	/**Values for the initial (lower) basket and target (upper) basket.*/
-	public int initialX = 200;  //this value will change over time to spawn baskets at random location
-	public int initialY =500;
+	public int initialX = 200;  //this value will change over time to spawn baskets at a random location
+	public int initialY =500; //the starting basket will ALWAYS be adjusted to this value.  Treat this as a constant for now.
 	public int targetX = 200; //this is the same as initialX by design of how randomizePosition is defined.
-	public int targetY = 1000;
+	public int targetY = 1000; //this affects the base starting height of the target basket.
 
 	/**Initializes all the global variables used in the program.*/
 	private SpriteBatch batch;
@@ -112,7 +112,7 @@ public class Main extends ApplicationAdapter {
 		Body groundBody = world.createBody(groundBodyDef);
 		// Create a polygon shape
 		PolygonShape groundBox = new PolygonShape();
-		// Set the polygon shape as a box which is twice the size of our view port and 20 high (setAsBox takes half-width and half-height as arguments!)
+		// sets the shape as a box (setAsBox takes half-width and half-height as arguments!)
 		groundBox.setAsBox(camera.viewportWidth, 1.0f); // the ground will take up the entire width of the screen, and 1 pixel high
 		// Create a fixture from our polygon shape and add it the body. Fixtures are responsible for collision.
 		groundBody.createFixture(groundBox, 0.0f);
@@ -122,7 +122,7 @@ public class Main extends ApplicationAdapter {
 		BodyDef leftWallDef = new BodyDef();
 		leftWallDef.type = BodyDef.BodyType.StaticBody;
 		leftWallDef.position.set(new Vector2(0, 0));
-		Body leftWall = world.createBody(leftWallDef); //CREATES THE ACTUAL BODY SO YOU CAN ADD THE BODY IN RENDER
+		Body leftWall = world.createBody(leftWallDef); 
 		PolygonShape leftWallBox = new PolygonShape();
 		leftWallBox.setAsBox(0, camera.viewportHeight);
 		leftWall.createFixture(leftWallBox, 0);
@@ -132,7 +132,7 @@ public class Main extends ApplicationAdapter {
 		BodyDef rightWallDef = new BodyDef();
 		rightWallDef.type = BodyDef.BodyType.StaticBody;
 		rightWallDef.position.set(new Vector2(1050/PPM, 0));
-		Body rightWall = world.createBody(rightWallDef); //CREATES THE ACTUAL BODY SO YOU CAN ADD THE BODY IN RENDER
+		Body rightWall = world.createBody(rightWallDef);
 		PolygonShape rightWallBox = new PolygonShape();
 		rightWallBox.setAsBox(0, camera.viewportHeight);
 		rightWall.createFixture(rightWallBox, 0);
@@ -145,7 +145,7 @@ public class Main extends ApplicationAdapter {
 		int[] randomPosition = this.randomizePosition(targetX, targetY);
 		this.drawBasketShape(randomPosition[0], randomPosition[1]);
 
-		/**THIS IS THE BOUNCING CAT*/
+		/**THIS CREATES THE BOUNCING CAT*/
 		BodyDef catBodyDef = new BodyDef();
 		catBodyDef.type = BodyDef.BodyType.DynamicBody;
 		catBodyDef.position.set(200/PPM, 1200/PPM);
@@ -161,13 +161,13 @@ public class Main extends ApplicationAdapter {
 		//Add the basket Actor to the stage
 		stage.addActor(basket1);
 
-		/**Lets the world detect collision between its objects */
+		/**Lets the world detect collision between its objects. */
 		world.setContactListener(new ContactListener() {
 
 			@Override
 			public void beginContact(Contact contact) {
-				Fixture fixtureA = contact.getFixtureA();
-				Fixture fixtureB = contact.getFixtureB();
+				Fixture fixtureA = contact.getFixtureA(); //this gets the first fixture of the collision
+				Fixture fixtureB = contact.getFixtureB(); //this gets the other fixture
 				Gdx.app.log("beginContact", "between " + fixtureA.getBody().toString() + " and " + fixtureB.getBody().toString());
 				if (fixtureA.getBody() == catBody.getBody()){
 					//System.out.println("fixtureA body = cat");
@@ -179,69 +179,32 @@ public class Main extends ApplicationAdapter {
 					//System.out.println("fixtureA body = target basket bottom!");
 				}
 
+				/**If the cat touches the basket's base, set bounce to 0, move the basket down, destroy the lower basket, and spawn a new basket */
 				if (fixtureA.getBody() == targetBasketBottom && fixtureB.getBody() == catBody.getBody()){
+
 					catBody.getFixture().setRestitution(0);
-					//System.out.println("Restitution of ball set to 0!");
-					//world.destroyBody(initialBasketBottom);
-					//world.destroyBody(initialBasketRight);
-					//world.destroyBody(initialBasketLeft);
 
-					/*bodiesToDestroy = new Body[3];
-					bodiesToDestroy[0] = initialBasketLeft;
-					bodiesToDestroy[1] = initialBasketBottom;
-					bodiesToDestroy[2] = initialBasketRight; */
-
-					/*
-					bodiesToDestroy = new Body[6];
-					bodiesToDestroy[0] = initialBasketBottom;
-					bodiesToDestroy[1] = initialBasketLeft;
-					bodiesToDestroy[2] = initialBasketRight;
-					bodiesToDestroy[3] = targetBasketBottom;
-					bodiesToDestroy[4] = targetBasketRight;
-					bodiesToDestroy[5] = targetBasketLeft; */
-
-					bodiesToDestroy = new Body[4];
+					bodiesToDestroy = new Body[2];
 					bodiesToDestroy[0] = initialBasketBottom;
 					bodiesToDestroy[1] = initialBasket;
-					bodiesToDestroy[2] = targetBasketBottom;
-					bodiesToDestroy[3] = targetBasket;
 
-					System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
-							+ " , " + initialBasketBottom.getPosition().y);
+					//System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
+							//+ " , " + initialBasketBottom.getPosition().y);
 
 					initialBasketBottom = targetBasketBottom;
 					initialBasket = targetBasket;
-					//initialBasketLeft = targetBasketLeft;
-					//initialBasketRight = targetBasketRight;
 
-					System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
-							+ " , " + initialBasketBottom.getPosition().y);
+					//System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
+							//+ " , " + initialBasketBottom.getPosition().y);
 
-					//targetBasketBottom.setTransform(initialX/PPM, initialY/PPM, 0);
+					targetBasketBottom.setLinearVelocity(0,-12f); //change this value to affect how fast the canopy falls
+					targetBasket.setLinearVelocity(0, -12f);
 
-					//initialBasketBottom.setTransform(((BodyDef)targetBasketBottom.getUserData()).position.x / PPM, initialY / PPM, 0);
-					//initialBasketLeft.setTransform(((BodyDef)targetBasketLeft.getUserData()).position.x/PPM, initialY/PPM, 0);
-					//initialBasketRight.setTransform(((BodyDef)targetBasketRight.getUserData()).position.x/PPM, initialY/PPM, 0);
-
-					System.out.println("User data for new initial basket bottom is: " + initialBasketBottom.getUserData());
-					System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
-									+ " , " + initialBasketBottom.getPosition().y);
-					//System.out.println("BodyDef target bottom x is: " + ((BodyDef)targetBasketBottom.getUserData()).position.x);
-					//System.out.println(initialBasketBottom.getPosition().x + ", " + initialBasketBottom.getPosition().y);
-
-
-					//world.destroyBody(targetBasketBottom);
-					//world.destroyBody(targetBasketLeft);
-					//world.destroyBody(targetBasketRight);
+					//System.out.println("User data for new initial basket bottom is: " + initialBasketBottom.getUserData());
+					//System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
+									//+ " , " + initialBasketBottom.getPosition().y);
 
 					scored = true;
-					//drawInitialBasket(initialX, initialY);
-
-					//int[] randomPosition = randomizePosition(targetX, targetY);
-					//drawBasketShape(randomPosition[0], randomPosition[1]);
-
-
-
 
 				}
 			}
@@ -280,22 +243,28 @@ public class Main extends ApplicationAdapter {
 
 		debugRenderer.render(world, camera.combined);
 
-		/**If the cat is in the target basket, spawn new basket. Still needs work... */
+		/**If the cat is in the target basket, spawn new basket. */
 		if (scored == true){
-			for (int i =0; i<bodiesToDestroy.length - 2; i++){
+			for (int i =0; i<bodiesToDestroy.length; i++){
 				world.destroyBody(bodiesToDestroy[i]);
 			}
-			drawInitialBasket((int)(targetBasketBottom.getPosition().x * PPM), initialY);
-			for (int i = 2; i < bodiesToDestroy.length; i++){
+			//drawInitialBasket((int)(targetBasketBottom.getPosition().x * PPM), initialY);
+			/*for (int i = 2; i < bodiesToDestroy.length; i++){
 				world.destroyBody(bodiesToDestroy[i]);
-			}
+			} */
 			int[] randomPosition = randomizePosition(initialX, targetY);
 			drawBasketShape(randomPosition[0], randomPosition[1]);
 
-			catBody.getFixture().setRestitution(0.5f);
+			//catBody.getFixture().setRestitution(0.5f);  do this in touchUp instead
 			scored = false;
 		}
 
+		/**If the upper basket moves the lower basket's spot, stop its velocity */
+		if (initialBasketBottom.getPosition().y * PPM < initialY){
+			System.out.println("basket reached initial position!");
+			initialBasketBottom.setLinearVelocity(0,0);
+			initialBasket.setLinearVelocity(0, 0);
+		}
 		world.step(1/60f, 6, 2);
 
 	}
@@ -461,16 +430,6 @@ public class Main extends ApplicationAdapter {
 		return initialBasketBottom;
 	}
 
-	/*
-	public Body getInitialBasketLeft() {
-		return initialBasketLeft;
-	}
-
-	public Body getInitialBasketRight() {
-
-		return initialBasketRight;
-	}
-	*/
 
 	public Body getInitialBasket(){
 		return initialBasket;
@@ -480,10 +439,9 @@ public class Main extends ApplicationAdapter {
 		batch.dispose();
 	}
 
-	public Body getBody() {
+	public CatBody getCatBody() {
 
-		Body body = catBody.getBody();
-		return body;
+		return catBody;
 	}
 
 }
