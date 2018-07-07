@@ -24,7 +24,7 @@ public class BasketActor extends Actor {
 
     /**Initializes global variables.*/
 
-    private PlayState game;
+    private final PlayState game;
     private Sprite sprite = new Sprite(new Texture("basket.png"));
 
     private float newX; //newX and initialX should be the same
@@ -98,7 +98,7 @@ public class BasketActor extends Actor {
 
                 System.out.println("angle of initial basket bottom is: " + game.getInitialBasket().getAngle());
 
-                game.render(PlayState.);
+                game.render(game.getSpriteBatch());
 
                 return false;
             }
