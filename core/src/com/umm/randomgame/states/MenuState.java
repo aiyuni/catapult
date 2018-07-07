@@ -22,12 +22,12 @@ public class MenuState extends State {
     }
     @Override
     public void handleInput() {
-/*
-if(game screen is touched){
-gsm.set(new PlayState(gsm));
-dipose();
+
+if(Gdx.input.isTouched()){
+gsm.set(new PlayState(gsm, main));
+dispose();
 }
- */
+
 
     }
 
