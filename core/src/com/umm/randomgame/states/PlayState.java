@@ -38,8 +38,6 @@ public class PlayState extends State  {
     /**height of screen**/
     public static final int HEIGHT = 1800;
 
-    private Texture test;
-
     /**Pixels per meter constant. This constant is to relate Box2D's physics with LibGDX sprites. */
     public static final float PPM = 30;
 
