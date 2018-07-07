@@ -255,23 +255,29 @@ handleInput();
 
         debugRenderer.render(world, camera.combined);
         world.step(1/60f, 6, 2);
-    }
-    public void render() {
-        //sb.begin();
-        //sb.draw(test, 0, 0, Main.WIDTH, Main.HEIGHT);
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
 
-        batch.begin();
-        basket1.draw(batch, 0);
-        cat.setCenter(catBody.getX()* PPM, catBody.getY() * PPM); //redraw the cat sprite whereever the cat body is
-        cat.draw(batch);
-        batch.end();
+        /**If the cat is in the target basket, spawn new basket. */
+        if (scored == true){
+            for (int i =0; i<bodiesToDestroy.length; i++){
+                world.destroyBody(bodiesToDestroy[i]);
+            }
+            //drawInitialBasket((int)(targetBasketBottom.getPosition().x * PPM), initialY);
+			/*for (int i = 2; i < bodiesToDestroy.length; i++){
+				world.destroyBody(bodiesToDestroy[i]);
+			} */
+            int[] randomPosition = randomizePosition(initialX, targetY);
+            drawBasketShape(randomPosition[0], randomPosition[1]);
 
-        debugRenderer.render(world, camera.combined);
-        world.step(1/60f, 6, 2);
+            //catBody.getFixture().setRestitution(0.5f);  do this in touchUp instead
+            scored = false;
+        }
 
-        //sb.end();
+        /**If the upper basket moves the lower basket's spot, stop its velocity */
+        if (initialBasketBottom.getPosition().y * PPM < initialY){
+			System.out.println("basket reached initial position!");
+			initialBasketBottom.setLinearVelocity(0,0);
+			initialBasket.setLinearVelocity(0, 0);
+		}
 
     }
 

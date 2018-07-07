@@ -156,7 +156,7 @@ public class BasketActor extends Actor {
                     game.getCatBody().getBody().applyLinearImpulse(impulseX, impulseY, game.getCatBody().getBody().getPosition().x,
                             game.getCatBody().getBody().getPosition().y, true);
 
-                    game.render(); //this must be called to update the dynamic shape!
+                    game.render(game.getSpriteBatch()); //this must be called to update the dynamic shape!
                     System.out.println("impulse is: " + impulseX + ", " + impulseY);
                 }
                 else {
