@@ -13,6 +13,7 @@ public class GameStateManager {
      */
     private Stack<State> states;
 
+
     /**
      * Constructor, creates stack of states.
      */

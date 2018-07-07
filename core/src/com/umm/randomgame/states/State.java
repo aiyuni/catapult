@@ -3,6 +3,7 @@ package com.umm.randomgame.states;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.umm.randomgame.Main;
 
 /**
  * Game States.
@@ -13,11 +14,20 @@ public abstract class State {
     protected OrthographicCamera cam;
     protected Vector3 mouse;
     protected GameStateManager gsm;
+    protected Main main;
     /**Constructs a game state.**/
     public State(GameStateManager gsm) {
         this.gsm = gsm;
         cam = new OrthographicCamera();
         mouse = new Vector3();
+    }
+
+    public State(GameStateManager gam, Main main){
+        this.gsm = gsm;
+        cam = new OrthographicCamera();
+        mouse = new Vector3();
+        this.main = main;
+
     }
     /** Place input handlers within this. **/
     public abstract void handleInput();

@@ -93,139 +93,13 @@ private GameStateManager gsm;
 		Gdx.input.setInputProcessor(stage); //enables LibGDX input listeners
 		Box2D.init(); //enables Box2D physics
 
-		cat = new Sprite(new Texture("shiny.png"));
-		cat.setScale(0.2f);
-
 		batch = new SpriteBatch();
 		gsm = new GameStateManager();
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		gsm.push(new MenuState(gsm));
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, WIDTH/PPM, HEIGHT/PPM);  //this is the typical android device resolution
 
-		world = new World(new Vector2(0, -50), true); //gravity is -50 m/s^2
-		debugRenderer = new Box2DDebugRenderer();
 
-		/** Creates the game ground for testing purposes (will remove later so the cat can fall out of the screen)*/
-		//Creates the ground BodyDef object: this determines the type and position of the ground
-		BodyDef groundBodyDef = new BodyDef();
-		groundBodyDef.type = BodyDef.BodyType.KinematicBody;
-		groundBodyDef.position.set(new Vector2(100/PPM, 1/PPM));
-		// Create a body from the BodyDef and add it to the world
-		Body groundBody = world.createBody(groundBodyDef);
-		// Create a polygon shape
-		PolygonShape groundBox = new PolygonShape();
-		// sets the shape as a box (setAsBox takes half-width and half-height as arguments!)
-		groundBox.setAsBox(camera.viewportWidth, 1.0f); // the ground will take up the entire width of the screen, and 1 pixel high
-		// Create a fixture from our polygon shape and add it the body. Fixtures are responsible for collision.
-		groundBody.createFixture(groundBox, 0.0f);
-		groundBox.dispose();
 
-		/**Creates the LEFT WALL static body so the cat can bounce off walls. */
-		BodyDef leftWallDef = new BodyDef();
-		leftWallDef.type = BodyDef.BodyType.StaticBody;
-		leftWallDef.position.set(new Vector2(0, 0));
-		Body leftWall = world.createBody(leftWallDef); 
-		PolygonShape leftWallBox = new PolygonShape();
-		leftWallBox.setAsBox(0, camera.viewportHeight);
-		leftWall.createFixture(leftWallBox, 0);
-		leftWallBox.dispose();
-
-		/**Creates the RIGHT WALL static body so the cat can bounce off walls. */
-		BodyDef rightWallDef = new BodyDef();
-		rightWallDef.type = BodyDef.BodyType.StaticBody;
-		rightWallDef.position.set(new Vector2(1050/PPM, 0));
-		Body rightWall = world.createBody(rightWallDef);
-		PolygonShape rightWallBox = new PolygonShape();
-		rightWallBox.setAsBox(0, camera.viewportHeight);
-		rightWall.createFixture(rightWallBox, 0);
-		rightWallBox.dispose();
-
-		/**Draws the initial (lower) basket */
-		this.drawInitialBasket(initialX, initialY);
-
-		/**Draws the target (upper) basket after randoming its position */
-		int[] randomPosition = this.randomizePosition(targetX, targetY);
-		this.drawBasketShape(randomPosition[0], randomPosition[1]);
-
-		/**THIS CREATES THE BOUNCING CAT*/
-		BodyDef catBodyDef = new BodyDef();
-		catBodyDef.type = BodyDef.BodyType.DynamicBody;
-		catBodyDef.position.set(200/PPM, 1200/PPM);
-		catBody = new CatBody(world, catBodyDef);
-
-		//Initializes the cat sprite in the same position as the cat body.
-		cat.setCenter(catBody.getX()* PPM, catBody.getY() * PPM);
-		System.out.println("Ball position on create is: " + catBody.getX() + ", " + catBody.getY());
-
-		//Create the initial basket sprite
-		basket1 = new BasketActor(this, getInitialBasketBottomPositionX() * 30, getInitialBasketBottomPositionY()* 30); //multiply by PPM cuz actor doesnt use PPM
-
-		//Add the basket Actor to the stage
-		stage.addActor(basket1);
-
-		/**Lets the world detect collision between its objects. */
-		world.setContactListener(new ContactListener() {
-
-			@Override
-			public void beginContact(Contact contact) {
-				Fixture fixtureA = contact.getFixtureA(); //this gets the first fixture of the collision
-				Fixture fixtureB = contact.getFixtureB(); //this gets the other fixture
-				Gdx.app.log("beginContact", "between " + fixtureA.getBody().toString() + " and " + fixtureB.getBody().toString());
-				if (fixtureA.getBody() == catBody.getBody()){
-					//System.out.println("fixtureA body = cat");
-				}
-				if (fixtureB.getBody() == catBody.getBody()){
-					//System.out.println("fixtureB body = cat");
-				}
-				if (fixtureA.getBody() == targetBasketBottom) {
-					//System.out.println("fixtureA body = target basket bottom!");
-				}
-
-				/**If the cat touches the basket's base, set bounce to 0, move the basket down, destroy the lower basket, and spawn a new basket */
-				if (fixtureA.getBody() == targetBasketBottom && fixtureB.getBody() == catBody.getBody()){
-
-					catBody.getFixture().setRestitution(0);
-
-					bodiesToDestroy = new Body[2];
-					bodiesToDestroy[0] = initialBasketBottom;
-					bodiesToDestroy[1] = initialBasket;
-
-					//System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
-							//+ " , " + initialBasketBottom.getPosition().y);
-
-					initialBasketBottom = targetBasketBottom;
-					initialBasket = targetBasket;
-
-					//System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
-							//+ " , " + initialBasketBottom.getPosition().y);
-
-					targetBasketBottom.setLinearVelocity(0,-12f); //change this value to affect how fast the canopy falls
-					targetBasket.setLinearVelocity(0, -12f);
-
-					//System.out.println("User data for new initial basket bottom is: " + initialBasketBottom.getUserData());
-					//System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
-									//+ " , " + initialBasketBottom.getPosition().y);
-
-					scored = true;
-
-				}
-			}
-
-			@Override
-			public void endContact(Contact contact) {
-				//ballBody.fixture.setRestitution(0.5f);  //cant reset restituion here, need to do it after the basket is transposed?
-			}
-
-			@Override
-			public void preSolve(Contact contact, Manifold oldManifold) {
-			}
-
-			@Override
-			public void postSolve(Contact contact, ContactImpulse impulse) {
-			}
-
-		});
 
 	}
 
@@ -237,16 +111,7 @@ private GameStateManager gsm;
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		gsm.update(Gdx.graphics.getDeltaTime());
 		gsm.render(batch);
-		stage.act(Gdx.graphics.getDeltaTime());
-		stage.draw();
 
-		batch.begin();
-		basket1.draw(batch, 0);
-		cat.setCenter(catBody.getX()* PPM, catBody.getY() * PPM); //redraw the cat sprite whereever the cat body is
-		cat.draw(batch);
-		batch.end();
-
-		debugRenderer.render(world, camera.combined);
 
 		/**If the cat is in the target basket, spawn new basket. */
 		if (scored == true){
@@ -265,12 +130,12 @@ private GameStateManager gsm;
 		}
 
 		/**If the upper basket moves the lower basket's spot, stop its velocity */
-		if (initialBasketBottom.getPosition().y * PPM < initialY){
+		/*if (initialBasketBottom.getPosition().y * PPM < initialY){
 			System.out.println("basket reached initial position!");
 			initialBasketBottom.setLinearVelocity(0,0);
 			initialBasket.setLinearVelocity(0, 0);
-		}
-		world.step(1/60f, 6, 2);
+		} */
+		//world.step(1/60f, 6, 2);
 
 	}
 
