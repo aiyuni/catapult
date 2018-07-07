@@ -22,24 +22,27 @@ public class MenuState extends State {
     }
     @Override
     public void handleInput() {
-if(Gdx.input.justTouched()){
-    gsm.set(new PlayState(gsm));
-    dispose();
+/*
+if(game screen is touched){
+gsm.set(new PlayState(gsm));
+dipose();
 }
+ */
+
     }
 
     @Override
     public void update(float dt) {
-handleInput();
+        handleInput();
     }
 
     @Override
     public void render(SpriteBatch sb) {
-sb.begin();
-sb.draw(background, 0,0, Main.WIDTH, Main.HEIGHT);
-sb.draw(gameTitle, ((Main.WIDTH/2)- (gameTitle.getWidth()/2)), (Main.HEIGHT/3*2));
-sb.draw(playButton, (Main.WIDTH/2) - (playButton.getWidth()/2), (Main.HEIGHT/2));
-sb.end();
+        sb.begin();
+        sb.draw(background, 0,0, Main.WIDTH, Main.HEIGHT);
+        sb.draw(gameTitle, ((Main.WIDTH/2)- (gameTitle.getWidth()/2)), (Main.HEIGHT/3*2));
+        sb.draw(playButton, (Main.WIDTH/2) - (playButton.getWidth()/2), (Main.HEIGHT/2));
+        sb.end();
     }
 
     @Override
