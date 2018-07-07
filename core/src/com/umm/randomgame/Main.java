@@ -34,11 +34,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import java.util.Random;
 
 
-/** ToDo: the diagonal lines that make up the basket body needs a proper rotation based on user drag.
-  * In order to do that, need to set the diagonal lines based on the updated bottom line's position whenever it updates,
- * rather than just the original bottom line's position.
- * This means the edgeShape set() method's vector needs to be updated based on the bottom line's angle, but the angle is returning the same value for 2 different
- * positions.
+/** ToDo:
  * ToDo:
  */
 public class Main extends ApplicationAdapter {
@@ -79,6 +75,7 @@ public class Main extends ApplicationAdapter {
 
 	private Body initialBasket;
 	private Body targetBasket;
+	private Body tempBasket;
 
 	private Sprite cat;
 
@@ -122,7 +119,7 @@ public class Main extends ApplicationAdapter {
 		BodyDef leftWallDef = new BodyDef();
 		leftWallDef.type = BodyDef.BodyType.StaticBody;
 		leftWallDef.position.set(new Vector2(0, 0));
-		Body leftWall = world.createBody(leftWallDef); 
+		Body leftWall = world.createBody(leftWallDef);
 		PolygonShape leftWallBox = new PolygonShape();
 		leftWallBox.setAsBox(0, camera.viewportHeight);
 		leftWall.createFixture(leftWallBox, 0);
@@ -156,7 +153,7 @@ public class Main extends ApplicationAdapter {
 		System.out.println("Ball position on create is: " + catBody.getX() + ", " + catBody.getY());
 
 		//Create the initial basket sprite
-		basket1 = new BasketActor(this, getInitialBasketBottomPositionX() * 30, getInitialBasketBottomPositionY()* 30); //multiply by PPM cuz actor doesnt use PPM
+		basket1 = new BasketActor(this, getInitialBasket().getPosition().x * 30, getInitialBasket().getPosition().y * 30); //multiply by PPM cuz actor doesnt use PPM
 
 		//Add the basket Actor to the stage
 		stage.addActor(basket1);
@@ -180,13 +177,15 @@ public class Main extends ApplicationAdapter {
 				}
 
 				/**If the cat touches the basket's base, set bounce to 0, move the basket down, destroy the lower basket, and spawn a new basket */
-				if (fixtureA.getBody() == targetBasketBottom && fixtureB.getBody() == catBody.getBody()){
+				if (fixtureA.getBody() == targetBasket && fixtureB.getBody() == catBody.getBody()){
 
 					catBody.getFixture().setRestitution(0);
+					//catBody.getBody().setLinearVelocity(0,0);
 
 					bodiesToDestroy = new Body[2];
 					bodiesToDestroy[0] = initialBasketBottom;
-					bodiesToDestroy[1] = initialBasket;
+					tempBasket = initialBasket;
+					bodiesToDestroy[1] = tempBasket;
 
 					//System.out.println("The new initial basket's bottom's position is: " + initialBasketBottom.getPosition().x
 							//+ " , " + initialBasketBottom.getPosition().y);
@@ -260,8 +259,8 @@ public class Main extends ApplicationAdapter {
 		}
 
 		/**If the upper basket moves the lower basket's spot, stop its velocity */
-		if (initialBasketBottom.getPosition().y * PPM < initialY){
-			System.out.println("basket reached initial position!");
+		if (initialBasket.getPosition().y * PPM < initialY){
+			//System.out.println("basket reached initial position!");
 			initialBasketBottom.setLinearVelocity(0,0);
 			initialBasket.setLinearVelocity(0, 0);
 		}
@@ -303,6 +302,7 @@ public class Main extends ApplicationAdapter {
 		System.out.println("angle of initial basket bottom is: " + initialBasketBottom.getAngle());
 		initialBasketBottom.createFixture(initialBasketBottomBox, 0);
 		initialBasketBottomBox.dispose();
+
 
 		/*
 
@@ -356,6 +356,7 @@ public class Main extends ApplicationAdapter {
 		basketLeftArm.dispose();
 		basketRightArm.dispose();
 
+
 		//Draw the bottom line for collision detection purposes
 		BodyDef targetBasketBottomDef = new BodyDef();
 		targetBasketBottomDef.type = BodyDef.BodyType.KinematicBody;  //BodyDef sets the position of the line
@@ -366,6 +367,7 @@ public class Main extends ApplicationAdapter {
 		targetBasketBottomBox.set(new Vector2(-1,0), new Vector2(1, 0));
 		targetBasketBottom.createFixture(targetBasketBottomBox, 0);
 		targetBasketBottomBox.dispose();
+
 
 		/*
 		//Right Diagonal Line for basket//
