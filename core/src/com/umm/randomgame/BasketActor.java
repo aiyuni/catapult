@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.utils.Align;
+import com.umm.randomgame.states.PlayState;
 
 /**This class defines the basket sprite.
  * The basket is what the user drags to shoot the cat.
@@ -23,7 +24,7 @@ public class BasketActor extends Actor {
 
     /**Initializes global variables.*/
 
-    private Main game;
+    private final PlayState game;
     private Sprite sprite = new Sprite(new Texture("basket.png"));
 
     private float newX; //newX and initialX should be the same
@@ -45,8 +46,8 @@ public class BasketActor extends Actor {
     private float diagonal;
 
     /**Constructor that takes in the game class reference, and the world location of the basket*/
-    public BasketActor(Main main, float startingX, float startingY) {
-        game = main;
+    public BasketActor(PlayState playState, float startingX, float startingY) {
+        game = playState;
         initialX = startingX;
         initialY = startingY;
         newX = initialX - sprite.getWidth()/2; //adjust initial position by half the sprite's width/height to make up for body to sprite coordinate conversion
@@ -101,7 +102,7 @@ public class BasketActor extends Actor {
 
                 }
 
-                game.render();
+                game.render(game.getSpriteBatch());
 
                 return false;
             }
