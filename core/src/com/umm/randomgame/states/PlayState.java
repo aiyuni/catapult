@@ -38,8 +38,6 @@ public class PlayState extends State  {
     /**height of screen**/
     public static final int HEIGHT = 1800;
 
-    private Texture test;
-
     /**Pixels per meter constant. This constant is to relate Box2D's physics with LibGDX sprites. */
     public static final float PPM = 30;
 
@@ -112,7 +110,7 @@ public class PlayState extends State  {
         groundBodyDef.type = BodyDef.BodyType.KinematicBody;
         groundBodyDef.position.set(new Vector2(100 / PPM, 1 / PPM));
         // Create a body from the BodyDef and add it to the world
-        Body groundBody = world.createBody(groundBodyDef);
+        final Body groundBody = world.createBody(groundBodyDef);
         // Create a polygon shape
         PolygonShape groundBox = new PolygonShape();
         // sets the shape as a box (setAsBox takes half-width and half-height as arguments!)
@@ -182,10 +180,17 @@ public class PlayState extends State  {
                     //System.out.println("fixtureA body = target basket bottom!");
                 }
 
+                if (fixtureA.getBody() == groundBody && fixtureB.getBody() == catBody.getBody()){
+                    System.out.println("catbody touched ground.");
+                    catBody.getBody().setTransform(targetBasketBottom.getPosition().x/PPM, targetBasketBottom.getPosition().y/PPM, 0);
+
+                }
+
                 /**If the cat touches the basket's base, set bounce to 0, move the basket down, destroy the lower basket, and spawn a new basket */
                 if (fixtureA.getBody() == targetBasketBottom && fixtureB.getBody() == catBody.getBody()) {
 
                     catBody.getFixture().setRestitution(0);
+                    //catBody.getFixture().setFriction(); //new
 
                     bodiesToDestroy = new Body[2];
                     bodiesToDestroy[0] = initialBasketBottom;
@@ -255,23 +260,31 @@ handleInput();
 
         debugRenderer.render(world, camera.combined);
         world.step(1/60f, 6, 2);
-    }
-    public void render() {
-        //sb.begin();
-        //sb.draw(test, 0, 0, Main.WIDTH, Main.HEIGHT);
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
 
-        batch.begin();
-        basket1.draw(batch, 0);
-        cat.setCenter(catBody.getX()* PPM, catBody.getY() * PPM); //redraw the cat sprite whereever the cat body is
-        cat.draw(batch);
-        batch.end();
+        /**If the cat is in the target basket, spawn new basket. */
+        if (scored == true){
+            for (int i =0; i<bodiesToDestroy.length; i++){
+                world.destroyBody(bodiesToDestroy[i]);
+            }
+            //drawInitialBasket((int)(targetBasketBottom.getPosition().x * PPM), initialY);
+			/*for (int i = 2; i < bodiesToDestroy.length; i++){
+				world.destroyBody(bodiesToDestroy[i]);
+			} */
+            int[] randomPosition = randomizePosition(initialX, targetY);
+            drawBasketShape(randomPosition[0], randomPosition[1]);
 
-        debugRenderer.render(world, camera.combined);
-        world.step(1/60f, 6, 2);
+            //catBody.getFixture().setRestitution(0.5f);  do this in touchUp instead
+            scored = false;
+        }
 
-        //sb.end();
+        /**If the upper basket moves the lower basket's spot, stop its velocity */
+        if (initialBasketBottom.getPosition().y * PPM < initialY){
+			System.out.println("basket reached initial position!");
+			initialBasketBottom.setLinearVelocity(0,0);
+			initialBasket.setLinearVelocity(0, 0);
+            catBody.getFixture().setRestitution(0.5f);
+            //catBody.getFixture().setFriction(0); //new
+		}
 
     }
 
@@ -288,9 +301,9 @@ handleInput();
         EdgeShape basketBase = new EdgeShape(); //PolygonShape sets how long the line is
         basketBase.set(new Vector2(-1,0), new Vector2(1, 0));
         EdgeShape basketLeftArm = new EdgeShape();
-        basketLeftArm.set(new Vector2(-1, 0), new Vector2(-3,3));
+        basketLeftArm.set(new Vector2(-1, 0), new Vector2(-3,2));
         EdgeShape basketRightArm = new EdgeShape();
-        basketRightArm.set(new Vector2(1, 0), new Vector2(3, 3));
+        basketRightArm.set(new Vector2(1, 0), new Vector2(3, 2));
         initialBasket.createFixture(basketBase,0);
         initialBasket.createFixture(basketRightArm,0);
         initialBasket.createFixture(basketLeftArm, 0);
@@ -353,9 +366,9 @@ handleInput();
         EdgeShape basketBase = new EdgeShape(); //PolygonShape sets how long the line is
         basketBase.set(new Vector2(-1,0), new Vector2(1, 0));
         EdgeShape basketLeftArm = new EdgeShape();
-        basketLeftArm.set(new Vector2(-1, 0), new Vector2(-3,3));
+        basketLeftArm.set(new Vector2(-1, 0), new Vector2(-3,2));
         EdgeShape basketRightArm = new EdgeShape();
-        basketRightArm.set(new Vector2(1, 0), new Vector2(3, 3));
+        basketRightArm.set(new Vector2(1, 0), new Vector2(3, 2));
         targetBasket.createFixture(basketBase,0);
         targetBasket.createFixture(basketRightArm,0);
         targetBasket.createFixture(basketLeftArm, 0);
