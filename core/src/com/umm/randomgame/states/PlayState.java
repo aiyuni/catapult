@@ -203,7 +203,7 @@ public class PlayState extends State  {
                 }
 
                 /**If the cat touches the basket's base, set bounce to 0, move the basket down, destroy the lower basket, and spawn a new basket */
-                if (fixtureA.getBody() == targetBasketBottom && fixtureB.getBody() == catBody.getBody()) {
+                if (fixtureA.getBody() == targetBasketBottom && fixtureB.getBody() == catBody.getBody() && catBody.getBody().getLinearVelocity().y < 0) {
 
                     catBody.getFixture().setRestitution(0);
                     //catBody.getFixture().setFriction(); //new
@@ -487,10 +487,13 @@ dipose();
         Random rand = new Random();
 
         if (x < 400) {
-            position[0] = rand.nextInt(400)  + 500;
+            position[0] = rand.nextInt(400)  + 600;
+        }
+        else if (x < 600) {
+            position[0] = rand.nextInt(100) + 100;
         }
         else {
-            position[0] = rand.nextInt(400) + 100;
+            position[0] = rand.nextInt(300) + 100;
         }
 
         position[1] = y + rand.nextInt(100) - 50;
