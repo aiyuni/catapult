@@ -23,10 +23,10 @@ public class MenuState extends State {
     @Override
     public void handleInput() {
 
-if(Gdx.input.isTouched()){
-gsm.set(new PlayState(gsm, main));
-dispose();
-}
+        if(Gdx.input.isTouched()){
+        gsm.set(new PlayState(gsm, main)    );
+        dispose();
+    }
 
 
     }
