@@ -1,8 +1,10 @@
 package com.umm.randomgame.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -24,6 +26,7 @@ import com.umm.randomgame.BasketActor;
 import com.umm.randomgame.CatBody;
 import com.umm.randomgame.Main;
 
+import java.awt.Color;
 import java.util.Random;
 
 /**
@@ -82,6 +85,11 @@ public class PlayState extends State  {
 
     private Sprite cat;
 
+    private static Preferences prefs = Gdx.app.getPreferences("HighScores");;
+    private int score;
+    private String scoreString;
+    BitmapFont scoreDisplay;
+
     public PlayState(GameStateManager gsm, Main main) {
         super(gsm);
         this.main = main;
@@ -107,6 +115,12 @@ public class PlayState extends State  {
 
         world = new World(new Vector2(0, -50), true); //gravity is -50 m/s^2
         debugRenderer = new Box2DDebugRenderer();
+
+        /**Initializes the score stuff*/
+        score = 0;
+        scoreString = "Score: " + score;
+        scoreDisplay = new BitmapFont();
+        scoreDisplay.getData().setScale(5);
 
         /** Creates the game ground for testing purposes (will remove later so the cat can fall out of the screen)*/
         //Creates the ground BodyDef object: this determines the type and position of the ground
@@ -205,6 +219,14 @@ public class PlayState extends State  {
                 /**If the cat touches the basket's base, set bounce to 0, move the basket down, destroy the lower basket, and spawn a new basket */
                 if (fixtureA.getBody() == targetBasketBottom && fixtureB.getBody() == catBody.getBody() && catBody.getBody().getLinearVelocity().y < 0) {
 
+                    //Modify score
+                    score++;
+                    scoreString = "Score: " + score;
+                    if (score > prefs.getInteger("MaxScore")){
+                        prefs.putInteger("MaxScore", score);
+                        prefs.flush();
+                    }
+
                     catBody.getFixture().setRestitution(0);
                     //catBody.getFixture().setFriction(); //new
 
@@ -276,6 +298,13 @@ dipose();
         basket2.draw(batch, 0);
         cat.setCenter(catBody.getX()* PPM, catBody.getY() * PPM); //redraw the cat sprite whereever the cat body is
         cat.draw(batch);
+        scoreDisplay.setColor(0.5f, 0.7f, 0.1f, 1.0f);
+        scoreDisplay.draw(batch, scoreString, 100, 1600);
+
+        //prefs.putInteger("Score", score);
+        //score = prefs.getInteger("Score" );
+        //prefs.flush();
+
         batch.end();
 
         debugRenderer.render(world, camera.combined);
@@ -346,6 +375,8 @@ dipose();
             basket1.setSpriteRotation(0);
             cat.setRotation(0);
             touchedGround = false;
+
+            gsm.set(new EndState(gsm));
         }
     }
 
