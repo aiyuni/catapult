@@ -1,5 +1,6 @@
 package com.umm.randomgame;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -10,10 +11,12 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.RotateToAction;
 
 
 /**Defines the Cat Body. */
-public class CatBody implements ContactListener {
+public class CatBody extends Actor implements ContactListener {
 
     public static final int PPM = 30;
 
@@ -22,12 +25,14 @@ public class CatBody implements ContactListener {
     private BodyDef bodyDef;
     private Fixture fixture;
     private CircleShape circle;
+    private Sprite cat;
 
     /**Constructs the cat body using its bodyDef parameter. */
-    public CatBody(World world, BodyDef bodyDef) {
+    public CatBody(World world, BodyDef bodyDef, Sprite cat) {
 
         this.world = world;
         this.bodyDef = bodyDef;
+        this.cat = cat;
 
         catBody = world.createBody(bodyDef);
 
@@ -44,6 +49,7 @@ public class CatBody implements ContactListener {
         fixture = catBody.createFixture(fixtureDef);
 
         circle.dispose();
+
     }
     @Override
     public void beginContact(Contact contact) {
