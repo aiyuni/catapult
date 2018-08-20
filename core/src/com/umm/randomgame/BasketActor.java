@@ -45,6 +45,8 @@ public class BasketActor extends Actor {
     private float yDifference;
     private float diagonal;
 
+    private InputAdapter basketInputAdapter;
+
     /**Constructor that takes in the game class reference, and the world location of the basket*/
     public BasketActor(PlayState playState, float startingX, float startingY) {
         game = playState;
@@ -63,7 +65,7 @@ public class BasketActor extends Actor {
         System.out.println("bounds: " + sprite.getX() + ", " + sprite.getY() + ", width: " + sprite.getWidth());
 
         /**Event listener for touch events */
-        Gdx.input.setInputProcessor(new InputAdapter() {
+        Gdx.input.setInputProcessor(basketInputAdapter = new InputAdapter() {
             @Override
             /**Takes in 3 parameters: x is the touch x coordinate, y is the touch y coordinate, pointer is useless */
             public boolean touchDragged (int x, int y, int pointer) {
@@ -115,65 +117,70 @@ public class BasketActor extends Actor {
             /**This method simply keeps track of the where the user touched, and whether or not the touch is out of range */
             @Override
             public boolean touchDown (int x, int y, int pointer, int button){
-                game.getCatBody().getFixture().setRestitution(0.5f);
+                if (!game.isPaused) {
+                    game.getCatBody().getFixture().setRestitution(0.5f);
 
-                System.out.println("Coordinate of pressing down is: " + x + ", " + y);
-                if (Math.abs(x - initialX) < 100 && Math.abs( 1800 - y - initialY) < 100) {
                     System.out.println("Coordinate of pressing down is: " + x + ", " + y);
-                    //System.out.println("pointer is: " + pointer);
-                    downX = x;
-                    downY = y;
-                    outOfRange = false;
-                    return true;
-                }else {
-                    System.out.println("touched too far");
-                    outOfRange = true;
-                    return false;
+                    if (Math.abs(x - initialX) < 100 && Math.abs(1800 - y - initialY) < 100) {
+                        System.out.println("Coordinate of pressing down is: " + x + ", " + y);
+                        //System.out.println("pointer is: " + pointer);
+                        downX = x;
+                        downY = y;
+                        outOfRange = false;
+                        return true;
+                    } else {
+                        System.out.println("touched too far");
+                        outOfRange = true;
+                        return false;
+                    }
                 }
+                return false;
             }
 
             /**Force is applied once the user releases their touch */
             @Override
             public boolean touchUp (int x, int y, int pointer, int button) {
 
-                //these are shadowed variables
-                float xDifference;
-                float yDifference;
+                if (!game.isPaused && Math.abs(game.getCatBody().getBody().getLinearVelocity().y) < 0.5) {
+                    //these are shadowed variables
+                    float xDifference;
+                    float yDifference;
 
-                xDifference = x - downX;
-                yDifference =  y - downY; //right equation!, not 1800 - y - downY
+                    xDifference = x - downX;
+                    yDifference = y - downY; //right equation!, not 1800 - y - downY
 
-                System.out.println("RELEASE x, flSED: Coordinate of pressing UP is: " + x + ", " + y);
-                System.out.println("pointer is: " + pointer);
-                System.out.println("Difference between release and click is: " + xDifference + ", " + yDifference );
+                    System.out.println("RELEASE x, flSED: Coordinate of pressing UP is: " + x + ", " + y);
+                    System.out.println("pointer is: " + pointer);
+                    System.out.println("Difference between release and click is: " + xDifference + ", " + yDifference);
 
-                /**If the user drag is within range, apply force based on the drag distance */
-                System.out.println("body's linear velocity in y is: " +  game.getCatBody().getBody().getLinearVelocity().y);
-                if (Math.abs(xDifference) < 300 && Math.abs(yDifference) < 400 && !outOfRange /*&& Math.abs(game.getCatBody().getBody().getLinearVelocity().y) < 1*/) {
-                    Body body = game.getCatBody().getBody();
-                    float mass = body.getMass(); //mass = density * area,  impulse / mass = velocity
+                    /**If the user drag is within range, apply force based on the drag distance */
+                    System.out.println("body's linear velocity in y is: " + game.getCatBody().getBody().getLinearVelocity().y);
+                    if (Math.abs(xDifference) < 300 && Math.abs(yDifference) < 400 && !outOfRange /*&& Math.abs(game.getCatBody().getBody().getLinearVelocity().y) < 1*/) {
+                        Body body = game.getCatBody().getBody();
+                        float mass = body.getMass(); //mass = density * area,  impulse / mass = velocity
 
-                    //change these values to affect the force of the ball
-                    float impulseX = -xDifference * 1.2f;
-                    float impulseY = -yDifference * 1.5f;
+                        //change these values to affect the force of the ball
+                        float impulseX = -xDifference * 1.2f;
+                        float impulseY = -yDifference * 1.5f;
 
-                    //applies the force to the cat
-                    game.getCatBody().getBody().applyLinearImpulse(impulseX, impulseY, game.getCatBody().getBody().getPosition().x,
-                            game.getCatBody().getBody().getPosition().y, true);
+                        //applies the force to the cat
+                        game.getCatBody().getBody().applyLinearImpulse(impulseX, impulseY, game.getCatBody().getBody().getPosition().x,
+                                game.getCatBody().getBody().getPosition().y, true);
 
-                    game.render(game.getSpriteBatch()); //this must be called to update the dynamic shape!
+                        game.render(game.getSpriteBatch()); //this must be called to update the dynamic shape!
 
-                    System.out.println("impulse is: " + impulseX + ", " + impulseY);
+                        System.out.println("impulse is: " + impulseX + ", " + impulseY);
+                    } else {
+                        System.out.println("dragged too far");
+                    }
+
+                    newX = initialX - sprite.getWidth() / 2;
+                    newY = initialY - sprite.getHeight() / 2;
+
+                    System.out.println("newX and Y after touchUp is:" + newX + " , " + newY);
+
+                    return false;
                 }
-                else {
-                    System.out.println("dragged too far");
-                }
-
-                newX = initialX - sprite.getWidth()/2;
-                newY = initialY - sprite.getHeight()/2;
-
-                System.out.println("newX and Y after touchUp is:"  + newX + " , " + newY);
-
                 return false;
             }
         });
@@ -214,4 +221,9 @@ public class BasketActor extends Actor {
     public void setSpriteRotation(float x){
         sprite.setRotation(x);
     }
+
+    public InputAdapter getBasketInputAdapter(){
+        return basketInputAdapter;
+    }
 }
+

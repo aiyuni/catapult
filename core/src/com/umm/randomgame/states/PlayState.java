@@ -1,6 +1,7 @@
 package com.umm.randomgame.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -112,7 +113,7 @@ public class PlayState extends State  {
         ScreenViewport viewport = new ScreenViewport();  //sets up the display
         stage = new Stage(viewport);
 
-        Gdx.input.setInputProcessor(stage); //enables LibGDX input listeners
+        //Gdx.input.setInputProcessor(stage); //enables LibGDX input listeners
         Box2D.init(); //enables Box2D physics
 
         batch = new SpriteBatch();
@@ -146,7 +147,7 @@ public class PlayState extends State  {
                 System.out.println("change event triggered");
             }
 
-            /*@Override
+            @Override
             public boolean handle (Event event){
                 if (isPaused == false){
                     System.out.println("changing pause to true");
@@ -156,8 +157,8 @@ public class PlayState extends State  {
                     System.out.println("changing pause to false");
                     isPaused = false;
                 }
-                return false;
-            } */
+                return true;
+            }
 
         });
 
@@ -183,7 +184,7 @@ public class PlayState extends State  {
         leftWallDef.position.set(new Vector2(0, 0));
         Body leftWall = world.createBody(leftWallDef);
         PolygonShape leftWallBox = new PolygonShape();
-        leftWallBox.setAsBox(0, camera.viewportHeight);
+        leftWallBox.setAsBox(0, 5000); //(0, camera.viewportHeight)
         leftWall.createFixture(leftWallBox, 0);
         leftWallBox.dispose();
 
@@ -193,7 +194,7 @@ public class PlayState extends State  {
         rightWallDef.position.set(new Vector2(1050 / PPM, 0));
         Body rightWall = world.createBody(rightWallDef);
         PolygonShape rightWallBox = new PolygonShape();
-        rightWallBox.setAsBox(0, camera.viewportHeight);
+        rightWallBox.setAsBox(0, 5000);
         rightWall.createFixture(rightWallBox, 0);
         rightWallBox.dispose();
 
@@ -225,6 +226,12 @@ public class PlayState extends State  {
         stage.addActor(basket1);
         stage.addActor(basket2);
         stage.addActor(pauseButton);
+
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(stage);
+        multiplexer.addProcessor(basket1.getBasketInputAdapter());
+        //multiplexer.addProcessor(basket2.getBasketInputAdapter());
+        Gdx.input.setInputProcessor(multiplexer); //enables LibGDX input listeners
 
         /**Lets the world detect collision between its objects. */
         world.setContactListener(new ContactListener() {
@@ -332,8 +339,24 @@ dipose();
 
     public void render(SpriteBatch batch){
 
+        if (isPaused){
+            stage.act(0);
+            stage.draw();
 
-        stage.act(Gdx.graphics.getDeltaTime());
+            batch.begin();
+            basket1.draw(batch, 0);
+            basket2.draw(batch, 0);
+            cat.setCenter(catBody.getX()* PPM, catBody.getY() * PPM); //redraw the cat sprite whereever the cat body is
+            cat.draw(batch);
+            scoreDisplay.setColor(0.5f, 0.7f, 0.1f, 1.0f);
+            scoreDisplay.draw(batch, scoreString, 100, 1600);
+            batch.end();
+            return;
+        }
+
+        else {
+            stage.act(Gdx.graphics.getDeltaTime());
+        }
         stage.draw();
 
         batch.begin();
