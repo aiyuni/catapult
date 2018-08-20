@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -44,15 +45,15 @@ public class MenuState extends State {
     }
     @Override
     public void handleInput() {
-pressPlay.addListener(new EventListener(){
-    @Override
-    public boolean handle (Event event){
-        gsm.set(new PlayState(gsm, main));
-        dispose();
-        return false;
-    }
+        pressPlay.addListener(new ClickListener(){
+        @Override
+        public boolean handle (Event event){
+            gsm.set(new PlayState(gsm, main));
+            dispose();
+            return false;
+        }
 
-});
+        });
 //        if(Gdx.input.isTouched()){
 //        gsm.set(new PlayState(gsm, main)    );
 //        dispose();

@@ -20,7 +20,13 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.umm.randomgame.BasketActor;
 import com.umm.randomgame.CatBody;
@@ -62,7 +68,7 @@ public class PlayState extends State  {
     private Box2DDebugRenderer debugRenderer;
     private Body[] bodiesToDestroy;
 
-    private Stage stage;
+    public Stage stage;
     private BasketActor basket1;
     private BasketActor basket2;
 
@@ -89,6 +95,10 @@ public class PlayState extends State  {
     private int score;
     private String scoreString;
     BitmapFont scoreDisplay;
+
+    private TextButton pauseButton;
+    private TextButton.TextButtonStyle pauseButtonStyle;
+    public boolean isPaused = false;
 
     public PlayState(GameStateManager gsm, Main main) {
         super(gsm);
@@ -121,6 +131,36 @@ public class PlayState extends State  {
         scoreString = "Score: " + score;
         scoreDisplay = new BitmapFont();
         scoreDisplay.getData().setScale(5);
+
+        /**Creates pause button text*/
+        pauseButtonStyle = new TextButton.TextButtonStyle();
+        pauseButtonStyle.font = new BitmapFont(); //???
+        pauseButton = new TextButton("Pause", pauseButtonStyle);
+        pauseButton.setPosition(900, 1700);
+        pauseButton.getLabel().setFontScale(5f);
+
+        /**Add event listener to pauseButton*/
+        pauseButton.addListener(new ChangeListener(){
+
+            public void changed(ChangeEvent event, Actor actor){
+                System.out.println("change event triggered");
+            }
+
+            /*@Override
+            public boolean handle (Event event){
+                if (isPaused == false){
+                    System.out.println("changing pause to true");
+                    isPaused = true;
+                }
+                else {
+                    System.out.println("changing pause to false");
+                    isPaused = false;
+                }
+                return false;
+            } */
+
+        });
+
 
         /** Creates the game ground for testing purposes (will remove later so the cat can fall out of the screen)*/
         //Creates the ground BodyDef object: this determines the type and position of the ground
@@ -184,6 +224,7 @@ public class PlayState extends State  {
         //Add the basket Actor to the stage
         stage.addActor(basket1);
         stage.addActor(basket2);
+        stage.addActor(pauseButton);
 
         /**Lets the world detect collision between its objects. */
         world.setContactListener(new ContactListener() {
@@ -290,6 +331,8 @@ dipose();
     }
 
     public void render(SpriteBatch batch){
+
+
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
 

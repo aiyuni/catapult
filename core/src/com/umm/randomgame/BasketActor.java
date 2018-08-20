@@ -67,48 +67,48 @@ public class BasketActor extends Actor {
             @Override
             /**Takes in 3 parameters: x is the touch x coordinate, y is the touch y coordinate, pointer is useless */
             public boolean touchDragged (int x, int y, int pointer) {
+                if (!game.isPaused) {
+                    //this if statement restricts the drag so that the basket only moves within a certain range.
+                    //however, the drag will STILL TAKE PLACE AS NORMAL (based on touchDown/touchUp) to calculate the cat speed; the basket won't update it's position to reflect
+                    //how much the user dragged after a certain range
+                    if (Math.abs(x - initialX) < 50 && Math.abs(1800 - y - initialY) < 70) {
 
-                //this if statement restricts the drag so that the basket only moves within a certain range.
-                //however, the drag will STILL TAKE PLACE AS NORMAL (based on touchDown/touchUp) to calculate the cat speed; the basket won't update it's position to reflect
-                //how much the user dragged after a certain range
-                if (Math.abs(x - initialX) < 50 && Math.abs(1800 - y - initialY) <70) {
+                        //newX and newY are adjusted coordinates calculated to use for draw().
+                        newX = x + 30 - sprite.getWidth() / 2;
+                        newY = 1800 - y + 50 - sprite.getHeight() / 2;  //1800 - y because libGDX coordinate system and box2D coordinate system in the y-direction are reversed
+                        System.out.println("NewY while dragging is: " + newY);
 
-                    //newX and newY are adjusted coordinates calculated to use for draw().
-                    newX = x + 30 - sprite.getWidth() / 2;
-                    newY = 1800 - y + 50 - sprite.getHeight() / 2;  //1800 - y because libGDX coordinate system and box2D coordinate system in the y-direction are reversed
-                    System.out.println("NewY while dragging is: " + newY);
+                        xDifference = x - initialX;
+                        yDifference = 1800 - y - initialY;
 
-                    xDifference = x - initialX;
-                    yDifference = 1800 - y - initialY;
+                        float oppOverAdj = yDifference / xDifference;
 
-                    float oppOverAdj = yDifference / xDifference;
+                        xAngle = (float) Math.atan(oppOverAdj);
+                        System.out.println("xDifference is: " + xDifference);
+                        System.out.println("Ydifference is: " + yDifference);
+                        System.out.println("xAngle is: " + xAngle);
 
-                    xAngle = (float) Math.atan(oppOverAdj);
-                    System.out.println("xDifference is: " + xDifference);
-                    System.out.println("Ydifference is: " + yDifference);
-                    System.out.println("xAngle is: " + xAngle);
+                        /**This rotates the bottom portion of the basket based on its center (origin) */
+                        if (xAngle > 0) {
+                            //game.getInitialBasket().setTransform(game.getInitialBasket().getPosition(), xAngle + 3 * (float) Math.PI / 2);
+                            //sprite.setRotation(xAngle + 5 * (float) Math.PI / 2);
+                            sprite.setRotation(-xAngle * 15);
 
-                    /**This rotates the bottom portion of the basket based on its center (origin) */
-                    if (xAngle > 0) {
-                        //game.getInitialBasket().setTransform(game.getInitialBasket().getPosition(), xAngle + 3 * (float) Math.PI / 2);
-                        //sprite.setRotation(xAngle + 5 * (float) Math.PI / 2);
-                        sprite.setRotation(-xAngle * 15 );
+                        } else if (xAngle < 0) {
+                            //game.getInitialBasket().setTransform(game.getInitialBasket().getPosition(), xAngle + (float) Math.PI / 2);
+                            //sprite.setRotation(xAngle + 8 * (float) Math.PI / 2);
+                            sprite.setRotation(-xAngle * 15);
+                        }
 
-                    } else if (xAngle < 0) {
-                        //game.getInitialBasket().setTransform(game.getInitialBasket().getPosition(), xAngle + (float) Math.PI / 2);
-                        //sprite.setRotation(xAngle + 8 * (float) Math.PI / 2);
-                        sprite.setRotation( -xAngle * 15);
+                        //this is for collision detection purposes for now
+                        //game.getInitialBasketBottom().setTransform(game.getInitialBasketBottom().getPosition(), xAngle + (float) Math.PI / 2);
+
+                        System.out.println("angle of initial basket bottom is: " + game.getInitialBasket().getAngle());
+
                     }
 
-                    //this is for collision detection purposes for now
-                    //game.getInitialBasketBottom().setTransform(game.getInitialBasketBottom().getPosition(), xAngle + (float) Math.PI / 2);
-
-                    System.out.println("angle of initial basket bottom is: " + game.getInitialBasket().getAngle());
-
+                    game.render(game.getSpriteBatch());
                 }
-
-                game.render(game.getSpriteBatch());
-
                 return false;
             }
 
