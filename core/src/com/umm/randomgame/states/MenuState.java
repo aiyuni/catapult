@@ -40,9 +40,14 @@ public class MenuState extends State {
         pressPlay = new ImageButton(drawableRegion);
         stage = new Stage(new ScreenViewport());
         stage.addActor(pressPlay);
+        pressPlay.setPosition((Main.WIDTH/2) - (playButton.getWidth()/2), (Main.HEIGHT/2));
         Gdx.input.setInputProcessor(stage);
 
     }
+    /*
+    * Handles input so that if the button is pressed it will send the user to the play screen
+    *
+    */
     @Override
     public void handleInput() {
         pressPlay.addListener(new ClickListener(){
@@ -70,12 +75,14 @@ public class MenuState extends State {
     @Override
     public void render(SpriteBatch sb) {
     stage.act(Gdx.graphics.getDeltaTime());
-    stage.draw();
-//        sb.begin();
-//        sb.draw(background, 0,0, Main.WIDTH, Main.HEIGHT);
-//        sb.draw(gameTitle, ((Main.WIDTH/2)- (gameTitle.getWidth()/2)), (Main.HEIGHT/3*2));
-//        sb.draw(playButton, (Main.WIDTH/2) - (playButton.getWidth()/2), (Main.HEIGHT/2));
-//        sb.end();
+        sb.begin();
+        sb.draw(background, 0,0, Main.WIDTH, Main.HEIGHT);
+        sb.draw(gameTitle, ((Main.WIDTH/2)- (gameTitle.getWidth()/2)), (Main.HEIGHT/3*2));
+       // sb.draw(playButton, (Main.WIDTH/2) - (playButton.getWidth()/2), (Main.HEIGHT/2));
+
+
+        stage.draw();
+        sb.end();
 
     }
 
