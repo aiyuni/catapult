@@ -51,11 +51,7 @@ private String text;
         stage = new Stage(new ScreenViewport());
         stage.addActor(pressPlay);
         pressPlay.setPosition(((Main.WIDTH/2) - (realPlayButton.getWidth()/2)), (Main.HEIGHT/2));
-        labelStyle = new Label.LabelStyle();
-        labelStyle.fontColor = Color.WHITE;
-        textLabel = new Label("Catapault", labelStyle);
-        stage.addActor(textLabel);
-        textLabel.setPosition(((Main.WIDTH/2)- (textLabel.getWidth()/2)), (Main.HEIGHT/3*2));
+        
         Gdx.input.setInputProcessor(stage);
 
 
