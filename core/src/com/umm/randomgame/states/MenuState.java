@@ -51,7 +51,7 @@ private String text;
         stage = new Stage(new ScreenViewport());
         stage.addActor(pressPlay);
         pressPlay.setPosition(((Main.WIDTH/2) - (realPlayButton.getWidth()/2)), (Main.HEIGHT/2));
-        
+
         Gdx.input.setInputProcessor(stage);
 
 
