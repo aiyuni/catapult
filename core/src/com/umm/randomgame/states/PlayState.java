@@ -70,6 +70,7 @@ public class PlayState extends State  {
     private Body[] bodiesToDestroy;
 
     public Stage stage;
+    private Texture background;
     private BasketActor basket1;
     private BasketActor basket2;
 
@@ -117,7 +118,7 @@ public class PlayState extends State  {
         Box2D.init(); //enables Box2D physics
 
         batch = new SpriteBatch();
-
+background = new Texture("background.png");
         cat = new Sprite(new Texture("shiny.png"));
         cat.setScale(0.2f);
 
@@ -344,6 +345,8 @@ dipose();
             stage.draw();
 
             batch.begin();
+            //draw background
+            batch.draw(background,0,0, WIDTH, HEIGHT);
             basket1.draw(batch, 0);
             basket2.draw(batch, 0);
             cat.setCenter(catBody.getX()* PPM, catBody.getY() * PPM); //redraw the cat sprite whereever the cat body is
