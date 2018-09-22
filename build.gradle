@@ -2,11 +2,13 @@ buildscript {
     
 
     repositories {
+
         mavenLocal()
         mavenCentral()
+        maven { url 'https://maven.google.com' }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
-        google()
+        //google()
     }
     dependencies {
         classpath 'org.wisepersist:gwt-gradle-plugin:1.0.6'
@@ -32,6 +34,8 @@ allprojects {
     }
 
     repositories {
+        google()
+        jcenter()
         mavenLocal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }

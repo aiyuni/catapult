@@ -6,7 +6,6 @@ import com.umm.randomgame.Main;
 
 /**
  * Pause state for catapault.
- * Created by Lena on 2018-08-07.
  */
 
 public class PauseState extends State {

@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * Manages the game's state, play/pause.
- * Created by Lena on 2018-06-27.
  */
 public class GameStateManager {
     /**

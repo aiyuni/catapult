@@ -42,7 +42,7 @@ public class EndState extends State {
         //Restart the game for now if you touch anywhere
         if (Gdx.input.isTouched()) {
             gsm.set(new PlayState(gsm, main));
-            System.out.println("Touched whole screen");
+//            System.out.println("Touched whole screen");
             dispose();
         }
     }
@@ -50,7 +50,7 @@ public class EndState extends State {
 
     public void create(){
         score = prefs.getInteger("MaxScore");
-        System.out.println("Your Max Score is: " + score);
+//        System.out.println("Your Max Score is: " + score);
         scoreString = "Score: " + score;
         scoreDisplay = new BitmapFont();
         scoreDisplay.getData().setScale(5);
