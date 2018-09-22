@@ -21,7 +21,6 @@ import com.umm.randomgame.Main;
 
 /**
  * Menu screen for the game.
- * Created by Lena on 2018-06-27.
  */
 
 public class MenuState extends State {
@@ -33,11 +32,6 @@ public class MenuState extends State {
     private TextureRegionDrawable drawableRegion;
     private Stage stage;
     private Texture realPlayButton;
-    private Label textLabel;
-    private Label.LabelStyle labelStyle;
-
-private BitmapFont font;
-private String text;
 
     public MenuState(GameStateManager gsm){
         super(gsm);
@@ -57,7 +51,7 @@ private String text;
 
 
     }
-    /*
+    /**
     * Handles input so that if the button is pressed it will send the user to the play screen
     *
     */

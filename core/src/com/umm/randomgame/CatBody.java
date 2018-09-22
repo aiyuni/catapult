@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.RotateToAction;
 
 
 /**Defines the Cat Body. */
-public class CatBody extends Actor implements ContactListener {
+public class CatBody extends Actor{
 
     public static final int PPM = 30;
 
@@ -50,25 +50,6 @@ public class CatBody extends Actor implements ContactListener {
 
         circle.dispose();
 
-    }
-    @Override
-    public void beginContact(Contact contact) {
-        //System.out.println("Began contact between: " + contact.getFixtureA().getBody().toString() + ", and " + contact.getFixtureB().getBody().toString());
-    }
-
-    @Override
-    public void endContact(Contact contact) {
-
-    }
-
-    @Override
-    public void preSolve(Contact contact, Manifold oldManifold) {
-        //this stuff is done continiously after each step while the object is colliding
-    }
-
-    @Override
-    public void postSolve(Contact contact, ContactImpulse impulse) {
-        //this stuff is done continiously after preSolve while the object is collidng
     }
 
     public float getX(){

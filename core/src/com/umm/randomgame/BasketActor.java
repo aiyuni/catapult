@@ -54,7 +54,7 @@ public class BasketActor extends Actor {
         initialY = startingY;
         newX = initialX - sprite.getWidth()/2; //adjust initial position by half the sprite's width/height to make up for body to sprite coordinate conversion
         newY = initialY - sprite.getHeight()/2;
-        System.out.println("Starting position for basket is: " + initialX + ", " + initialY );
+        //System.out.println("Starting position for basket is: " + initialX + ", " + initialY );
 
         setTouchable(Touchable.enabled); //allows the sprite to respond to touch events
 
@@ -62,7 +62,7 @@ public class BasketActor extends Actor {
         sprite.setScale(1f); //change this to resize the sprite if needed
 
         setBounds(sprite.getX(),sprite.getY(),sprite.getWidth(),sprite.getHeight()); //sets the sprite boundaries
-        System.out.println("bounds: " + sprite.getX() + ", " + sprite.getY() + ", width: " + sprite.getWidth());
+        //System.out.println("bounds: " + sprite.getX() + ", " + sprite.getY() + ", width: " + sprite.getWidth());
 
         /**Event listener for touch events */
         Gdx.input.setInputProcessor(basketInputAdapter = new InputAdapter() {
@@ -78,7 +78,7 @@ public class BasketActor extends Actor {
                         //newX and newY are adjusted coordinates calculated to use for draw().
                         newX = x + 30 - sprite.getWidth() / 2;
                         newY = 1800 - y + 50 - sprite.getHeight() / 2;  //1800 - y because libGDX coordinate system and box2D coordinate system in the y-direction are reversed
-                        System.out.println("NewY while dragging is: " + newY);
+                        //System.out.println("NewY while dragging is: " + newY);
 
                         xDifference = x - initialX;
                         yDifference = 1800 - y - initialY;
@@ -86,9 +86,9 @@ public class BasketActor extends Actor {
                         float oppOverAdj = yDifference / xDifference;
 
                         xAngle = (float) Math.atan(oppOverAdj);
-                        System.out.println("xDifference is: " + xDifference);
-                        System.out.println("Ydifference is: " + yDifference);
-                        System.out.println("xAngle is: " + xAngle);
+                        //System.out.println("xDifference is: " + xDifference);
+                        //System.out.println("Ydifference is: " + yDifference);
+                        //System.out.println("xAngle is: " + xAngle);
 
                         /**This rotates the bottom portion of the basket based on its center (origin) */
                         if (xAngle > 0) {
@@ -105,7 +105,7 @@ public class BasketActor extends Actor {
                         //this is for collision detection purposes for now
                         //game.getInitialBasketBottom().setTransform(game.getInitialBasketBottom().getPosition(), xAngle + (float) Math.PI / 2);
 
-                        System.out.println("angle of initial basket bottom is: " + game.getInitialBasket().getAngle());
+                        //System.out.println("angle of initial basket bottom is: " + game.getInitialBasket().getAngle());
 
                     }
 
@@ -120,7 +120,7 @@ public class BasketActor extends Actor {
                 if (!game.isPaused) {
                     game.getCatBody().getFixture().setRestitution(0.5f);
 
-                    System.out.println("Coordinate of pressing down is: " + x + ", " + y);
+                    //System.out.println("Coordinate of pressing down is: " + x + ", " + y);
                     if (Math.abs(x - initialX) < 100 && Math.abs(1800 - y - initialY) < 100) {
                         System.out.println("Coordinate of pressing down is: " + x + ", " + y);
                         //System.out.println("pointer is: " + pointer);
@@ -149,12 +149,12 @@ public class BasketActor extends Actor {
                     xDifference = x - downX;
                     yDifference = y - downY; //right equation!, not 1800 - y - downY
 
-                    System.out.println("RELEASE x, flSED: Coordinate of pressing UP is: " + x + ", " + y);
-                    System.out.println("pointer is: " + pointer);
-                    System.out.println("Difference between release and click is: " + xDifference + ", " + yDifference);
+                   // System.out.println("RELEASE x, flSED: Coordinate of pressing UP is: " + x + ", " + y);
+//                    System.out.println("pointer is: " + pointer);
+//                    System.out.println("Difference between release and click is: " + xDifference + ", " + yDifference);
 
                     /**If the user drag is within range, apply force based on the drag distance */
-                    System.out.println("body's linear velocity in y is: " + game.getCatBody().getBody().getLinearVelocity().y);
+//                    System.out.println("body's linear velocity in y is: " + game.getCatBody().getBody().getLinearVelocity().y);
                     if (Math.abs(xDifference) < 300 && Math.abs(yDifference) < 400 && !outOfRange /*&& Math.abs(game.getCatBody().getBody().getLinearVelocity().y) < 1*/) {
                         Body body = game.getCatBody().getBody();
                         float mass = body.getMass(); //mass = density * area,  impulse / mass = velocity
@@ -169,15 +169,15 @@ public class BasketActor extends Actor {
 
                         game.render(game.getSpriteBatch()); //this must be called to update the dynamic shape!
 
-                        System.out.println("impulse is: " + impulseX + ", " + impulseY);
+//                        System.out.println("impulse is: " + impulseX + ", " + impulseY);
                     } else {
-                        System.out.println("dragged too far");
+//                        System.out.println("dragged too far");
                     }
 
                     newX = initialX - sprite.getWidth() / 2;
                     newY = initialY - sprite.getHeight() / 2;
 
-                    System.out.println("newX and Y after touchUp is:" + newX + " , " + newY);
+//                    System.out.println("newX and Y after touchUp is:" + newX + " , " + newY);
 
                     return false;
                 }
@@ -192,7 +192,7 @@ public class BasketActor extends Actor {
         initialY = startingY;
         newX = initialX - sprite.getWidth()/2; //adjust initial position by half the sprite's width/height to make up for body to sprite coordinate conversion
         newY = initialY - sprite.getHeight()/2;
-        System.out.println("Starting position for basket is: " + initialX + ", " + initialY );
+//        System.out.println("Starting position for basket is: " + initialX + ", " + initialY );
 
         //setTouchable(Touchable.enabled); //allows the sprite to respond to touch events
 
@@ -200,7 +200,7 @@ public class BasketActor extends Actor {
         sprite.setScale(1f); //change this to resize the sprite if needed
 
         setBounds(sprite.getX(),sprite.getY(),sprite.getWidth(),sprite.getHeight()); //sets the sprite boundaries
-        System.out.println("bounds: " + sprite.getX() + ", " + sprite.getY() + ", width: " + sprite.getWidth());
+//        System.out.println("bounds: " + sprite.getX() + ", " + sprite.getY() + ", width: " + sprite.getWidth());
     }
 
     /*This method is called from Main Render so that the basket Actor can update its position */
